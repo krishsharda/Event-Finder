@@ -1,0 +1,31 @@
+services:
+  # Backend API Service
+  - type: web
+    name: event-finder-backend
+    runtime: node
+    region: singapore
+    plan: free
+    buildCommand: cd backend && npm install && npm run build
+    startCommand: cd backend && npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+    healthCheckPath: /health
+
+  # Frontend Static Site
+  - type: web
+    name: event-finder-frontend
+    runtime: static
+    region: singapore
+    plan: free
+    buildCommand: cd frontend && npm install && npm run build
+    staticPublishPath: ./frontend/dist
+    routes:
+      - type: rewrite
+        source: /api/*
+        destination: https://event-finder-backend.onrender.com/api/*
+      - type: rewrite
+        source: /*
+        destination: /index.html
