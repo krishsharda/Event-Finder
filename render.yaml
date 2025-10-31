@@ -6,8 +6,10 @@ services:
     region: singapore
     plan: free
     rootDir: backend
-    buildCommand: npm install && npm run build
+    # Install devDependencies during build so TypeScript and @types/* are available
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: node dist/server.js
+    nodeVersion: 20
     envVars:
       - key: NODE_ENV
         value: production
