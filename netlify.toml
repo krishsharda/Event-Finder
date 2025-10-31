@@ -1,8 +1,8 @@
 # Netlify configuration for unified frontend + serverless API
 
 [build]
-# Install deps for both backend (for function bundling) and frontend, then build frontend
-command = "npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend"
+# Install root deps (for function bundling resolution), backend deps, and frontend deps; then build frontend
+command = "npm ci && npm ci --prefix backend && npm ci --prefix frontend && npm run build --prefix frontend"
 publish = "frontend/dist"
 
 [functions]
