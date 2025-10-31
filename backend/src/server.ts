@@ -8,7 +8,7 @@ import { seedEvents } from './storage/seed';
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 8080;
 const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
 
 // Middleware
@@ -53,7 +53,12 @@ app.get('/health', (req: Request, res: Response) => {
 app.use('/api/events', eventRoutes);
 
 // Seed demo events (India) if storage is empty
-seedEvents();
+try {
+  seedEvents();
+  console.log('✅ Seed events loaded');
+} catch (error) {
+  console.error('⚠️  Failed to seed events:', error);
+}
 
 // 404 handler
 app.use((req: Request, res: Response) => {
@@ -65,11 +70,13 @@ app.use((req: Request, res: Response) => {
 
 // Global error handler
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error('Unhandled error:', err);
+  console.error('❌ Unhandled error:', err);
+  console.error('Error stack:', err.stack);
   res.status(500).json({
     success: false,
     error: 'Internal server error',
-    message: process.env.NODE_ENV === 'development' ? err.message : undefined
+    message: err.message,
+    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
   });
 });
 
