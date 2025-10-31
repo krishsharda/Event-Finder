@@ -8,13 +8,18 @@ import { seedEvents } from './storage/seed';
 dotenv.config();
 
 const app: Express = express();
-const PORT = process.env.PORT || 8080;
-const CORS_ORIGIN = process.env.CORS_ORIGIN || 'http://localhost:5173';
+const PORT = process.env.PORT || 4000;
+// Clean CORS_ORIGIN by trimming whitespace and removing quotes
+const CORS_ORIGIN = (process.env.CORS_ORIGIN || 'http://localhost:5173')
+  .trim()
+  .replace(/^["']|["']$/g, ''); // Remove leading/trailing quotes
+
+console.log('🌐 CORS configured for:', CORS_ORIGIN);
 
 // Middleware
 app.use(cors({
-  origin: CORS_ORIGIN,
-  credentials: true
+  origin: CORS_ORIGIN === '*' ? '*' : CORS_ORIGIN,
+  credentials: CORS_ORIGIN !== '*'
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
