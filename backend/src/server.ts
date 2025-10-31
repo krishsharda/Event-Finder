@@ -25,6 +25,21 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
+// Root endpoint
+app.get('/', (req: Request, res: Response) => {
+  res.status(200).json({
+    success: true,
+    message: 'Event Finder API',
+    version: '1.0.0',
+    endpoints: {
+      health: '/health',
+      events: '/api/events',
+      createEvent: 'POST /api/events',
+      getEvent: '/api/events/:id'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/health', (req: Request, res: Response) => {
   res.status(200).json({
