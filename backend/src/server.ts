@@ -1,6 +1,7 @@
 import express, { Express, Request, Response, NextFunction } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import path from 'path';
 import eventRoutes from './routes/eventRoutes';
 import { seedEvents } from './storage/seed';
 
@@ -9,17 +10,12 @@ dotenv.config();
 
 const app: Express = express();
 const PORT = process.env.PORT || 4000;
-// Clean CORS_ORIGIN by trimming whitespace and removing quotes
-const CORS_ORIGIN = (process.env.CORS_ORIGIN || 'http://localhost:5173')
-  .trim()
-  .replace(/^["']|["']$/g, ''); // Remove leading/trailing quotes
 
-console.log('🌐 CORS configured for:', CORS_ORIGIN);
-
-// Middleware
+// CORS: Allow all origins since we're serving frontend from same origin
+// Only needed for local dev when frontend runs on different port
 app.use(cors({
-  origin: CORS_ORIGIN === '*' ? '*' : CORS_ORIGIN,
-  credentials: CORS_ORIGIN !== '*'
+  origin: true,
+  credentials: true
 }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -65,12 +61,13 @@ try {
   console.error('⚠️  Failed to seed events:', error);
 }
 
-// 404 handler
-app.use((req: Request, res: Response) => {
-  res.status(404).json({
-    success: false,
-    error: 'Route not found'
-  });
+// Serve frontend static files (in production)
+const frontendDistPath = path.join(__dirname, '../../frontend/dist');
+app.use(express.static(frontendDistPath));
+
+// SPA fallback - serve index.html for all non-API routes
+app.get('*', (req: Request, res: Response) => {
+  res.sendFile(path.join(frontendDistPath, 'index.html'));
 });
 
 // Global error handler
@@ -89,7 +86,7 @@ app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📝 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🌐 CORS enabled for: ${CORS_ORIGIN}`);
+  console.log(`🌐 CORS enabled for all origins (same-origin + dev)`);
 });
 
 export default app;

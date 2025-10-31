@@ -1,7 +1,8 @@
 import axios, { AxiosError } from 'axios';
 import { Event, CreateEventDTO, EventQueryParams, ApiResponse } from '../types/event.types';
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+// Use relative URL for same-origin deployment, fallback to localhost for dev
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
