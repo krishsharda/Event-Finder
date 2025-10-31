@@ -17,7 +17,6 @@ services:
   - type: web
     name: event-finder-frontend
     env: static
-    region: singapore
     plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build
